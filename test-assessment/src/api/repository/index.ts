@@ -1,7 +1,7 @@
 // This file serves as a central point to export all API repositories.
 
-import UploadApi from './upload';
-import ListingApi from './listing';
+import UploadApi from '@/api/repository/upload';
+import ListingApi from '@/api/repository/listing';
 
 const apiRepository = {
     upload: UploadApi, // UploadApi handles file uploads and related operations

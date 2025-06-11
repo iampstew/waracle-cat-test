@@ -12,9 +12,9 @@ export default function Header() {
             <span className="text-gray-400 text-sm">Cat upload assessment</span>
           </div>
           <div className="flex-1 justify-end">
-            <button type="button" className='bg-emerald-800 ms-auto text-white px-4 py-2 rounded hover:bg-emerald-600 transition-colors'>
+            <a href="/upload" className='bg-emerald-800 ms-auto text-white px-4 py-2 rounded hover:bg-emerald-600 transition-colors'>
                 Upload cat
-            </button>
+            </a>
           </div>
         </div>
       </div>

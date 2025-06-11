@@ -20,6 +20,27 @@ class ListingApi {
     removeFromFavourites(favourite: FavouriteViewModel): Promise<any> {
         return baseApi.delete(`/favourites/${favourite.id}`);
     }
+
+    // This method is used to get the user's favourite images.
+    getVotesForImage(): Promise<any> {
+        return baseApi.get(`/votes?&sub_id=${useGlobal().subId}`);
+    }
+
+    // This method is used to get the user's favourite images.
+    upVoteImage(imageId: string): Promise<any> {
+        return baseApi.post(`/votes`, {
+            image_id: imageId,
+            value: 1
+        });
+    }      
+    
+    // This method is used to get the user's favourite images.
+    downVoteImage(imageId: string): Promise<any> {
+        return baseApi.post(`/votes`, {
+            image_id: imageId,
+            value: -1
+        });
+    }   
 }
 
 
