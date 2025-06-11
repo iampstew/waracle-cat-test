@@ -1,5 +1,5 @@
 
-import waracleLogo from '../../assets/waracle-logo.svg';
+import waracleLogo from '@/assets/waracle-logo.svg';
 export default function Header() {
   return (
     <header className="border-b border-gray-800 bg-gray-900 shadow-sm py-4" role="banner">
