@@ -31,7 +31,7 @@ export default function ListItemVoting(item: Props) {
     }
   }
 
-   const downVoteImage = async () => {
+  const downVoteImage = async () => {
     setLoading(true);
     try {
       await apiRepository.listing.downVoteImage(item.id);
