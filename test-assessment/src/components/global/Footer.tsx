@@ -1,4 +1,6 @@
-export default function Header() {
+import type { FC } from "react"
+
+const Footer: FC = () => {
   return (
     <footer className="border-t border-gray-950 py-4" role="contentinfo">
         <div className="container mx-auto px-4 text-center text-gray-400 text-sm">
@@ -7,3 +9,5 @@ export default function Header() {
     </footer>
   )
 }
+
+export default Footer
