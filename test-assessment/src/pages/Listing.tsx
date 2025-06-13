@@ -1,53 +1,81 @@
-import { useEffect, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import apiRepository from "@/api/repository";
-import ListingItem from "@/components/listing/ListingItem";
+import ListItem from "@/components/listing/ListItem";
 import type { CatItemDto } from "@/types/cat";
+import type { CatFavouritesDto } from "@/types/favourite";
+import type { CatVoteDto } from "@/types/vote";
 
-export default function Listing() {
-  const [catImages, setCatImages] = useState<CatItemDto[]>([]);
-  const [loading, setLoading] = useState(true);
+const Listing: FC = () => {
+  const [cats, setCats] = useState<CatItemDto[]>([]);
+  const [votes, setVotes] = useState<CatVoteDto[]>([]);
+  const [favourites, setFavourites] = useState<CatFavouritesDto[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getAllCats = async () => {
-    try {
-      setLoading(true);
-      setError(null); // Reset previous error
-      const res = await apiRepository.listing.getAllCats();
-      if (res.data.length === 0) {
-        setError("No cats have been uploaded yet.");
-      }
-      setCatImages(res.data);
-    } catch (error) {
-      console.error("Failed to fetch cats:", error);
-      setError("No cats have been uploaded yet.");
+  const init = async () => {
+    setLoading(true);
+    setError(null);
+    await loadData();
+  };
+
+  const loadData = async () => {
+     try {
+      const [catsRes, votesRes, favsRes] = await Promise.all([
+        apiRepository.listing.getAllCats(),
+        apiRepository.listing.getVotes(),
+        apiRepository.listing.getFavourites(),
+      ]);
+
+      setCats(catsRes.data);
+      setVotes(votesRes.data);
+      setFavourites(favsRes.data);
+    } catch (e: any) {
+      console.error("Error loading data", e);
+      setError("Failed to load cat data. Please try again later.");
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  const checkVotesById = (imageId: string) =>
+    votes.find((vote) => vote.image_id === imageId);
+
+  const checkFavouriteById = (imageId: string) =>
+    favourites.find((fav) => fav.image_id === imageId);
 
   useEffect(() => {
-    getAllCats();
+    init();
   }, []);
 
+  if (loading) {
+    return <div>Loading cats...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-600">{error}</div>;
+  }
+
   return (
-    <div className="py-8">
-      <h1 className="text-3xl font-bold">Cat listing</h1>
-      {loading ? (
-        <div className="text-gray-400 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto mt-4"></div>
-          <p className="mt-2">Loading...</p>
-        </div>
-      ) : error ? (
-        <div className="bg-red-100 text-red-700 p-4 mt-4 rounded-md">
-          <p>{error}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-          {catImages.map((cat: CatItemDto) => (
-            <ListingItem key={cat.id} {...cat} />
-          ))}
-        </div>
-      )}
+    <div>
+      <h1 className="text-4xl font-semibold mb-4">Cat Listing</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {cats.map((cat) => {
+          const vote = checkVotesById(cat.id);
+          const favourite = checkFavouriteById(cat.id);
+
+          return (
+            <ListItem
+              key={cat.id}
+              cat={cat}
+              vote={vote}
+              favourite={favourite}
+              onUpdate={loadData}
+            />
+          );
+        })}
+      </div>
     </div>
   );
-}
+};
+
+export default Listing;

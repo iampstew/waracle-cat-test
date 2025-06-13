@@ -1,47 +1,43 @@
 import { useGlobal } from "@/composables/useGlobal";
 import { baseApi } from "@/api/base";
-import type { AddFavouriteViewModel, FavouriteViewModel } from "@/types/favourites";
+import type { AxiosResponse } from "axios";
+import type { CatItemDto } from "@/types/cat";
+import type { CatVoteDto } from "@/types/vote";
+import type { CatFavouriteId, CatFavouritesDto } from "@/types/favourite";
+const { subId } = useGlobal();
 
 class ListingApi {
-    // This method is used to get a list of cat images.
-    getAllCats(): Promise<any> {
-        return baseApi.get(`/images?limit=20&api_key=${useGlobal().apiKey}&sub_id=${useGlobal().subId}`);
+
+    getAllCats(): Promise<AxiosResponse<CatItemDto[]>> {
+        return baseApi.get(`/images?limit=20&sub_id=${subId}`);
     }
 
-    // This method is used to get a specific cat image by its ID.
-    addToFavourites(imageId: string): Promise<any> {
-        return baseApi.post<AddFavouriteViewModel>(`/favourites`, {
+    addToFavourites(imageId: string): Promise<AxiosResponse<CatFavouriteId>> {
+        return baseApi.post<CatFavouriteId>(`/favourites`, {
             image_id: imageId,
-            sub_id: useGlobal().subId
+            sub_id: subId,
         });
     }
 
-    // This method is used to remove a favourite image from the user's favourites list.
-    removeFromFavourites(favourite: FavouriteViewModel): Promise<any> {
-        return baseApi.delete(`/favourites/${favourite.id}`);
+    removeFromFavourites(favouriteId: number): Promise<any> {
+        return baseApi.delete(`/favourites/${favouriteId}`);
     }
 
-    // This method is used to get the user's favourite images.
-    getVotesForImage(): Promise<any> {
-        return baseApi.get(`/votes?&sub_id=${useGlobal().subId}`);
+    getFavourites(): Promise<AxiosResponse<CatFavouritesDto[]>> {
+        return baseApi.get(`/favourites?sub_id=${subId}`);
     }
 
-    // This method is used to get the user's favourite images.
-    upVoteImage(imageId: string): Promise<any> {
-        return baseApi.post(`/votes`, {
+    getVotes(): Promise<AxiosResponse<CatVoteDto[]>> {
+        return baseApi.get<CatVoteDto[]>(`/votes?sub_id=${subId}`);
+    }
+
+    voteImage(imageId: string, value: number): Promise<AxiosResponse<CatVoteDto>> {
+        return baseApi.post<CatVoteDto>('/votes', {
             image_id: imageId,
-            value: 1
-        });
-    }      
-    
-    // This method is used to get the user's favourite images.
-    downVoteImage(imageId: string): Promise<any> {
-        return baseApi.post(`/votes`, {
-            image_id: imageId,
-            value: -1
-        });
-    }   
+            sub_id: subId,
+            value: value,
+        })
+    }
 }
-
 
 export default new ListingApi();
